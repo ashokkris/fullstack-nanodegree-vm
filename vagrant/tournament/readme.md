@@ -16,9 +16,9 @@ tournament/
 ### Quick Start
 1. cd to the ‘tournament’ folder
 2. To build the database, tables and views, run from command line:  
-**_ >>psql \i tournament.sql _**
+**>>psql \i tournament.sql**
 3. To execute the series of tests, run from command line:  
-**_ >>python tournament_test.py _**
+**>>python tournament_test.py**
 4. Inspect the output to verify that all tests passed
 
 ###Documentation

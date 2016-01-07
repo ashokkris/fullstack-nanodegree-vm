@@ -108,11 +108,13 @@ def testPairings():
     registerPlayer("Fluttershy")
     registerPlayer("Applejack")
     registerPlayer("Pinkie Pie")
+
     standings = playerStandings()
     [id1, id2, id3, id4] = [row[0] for row in standings]
     reportMatch(id1, id2)
     reportMatch(id3, id4)
     pairings = swissPairings()
+    
     if len(pairings) != 2:
         raise ValueError(
             "For four players, swissPairings should return two pairs.")
@@ -125,6 +127,96 @@ def testPairings():
     print "8. After one match, players with one win are paired."
 
 
+def testCanPair():
+    deleteMatches()
+    deletePlayers()
+    registerPlayer("Twilight Sparkle")
+    registerPlayer("Fluttershy")
+    registerPlayer("Applejack")
+    registerPlayer("Pinkie Pie")
+
+    standings = playerStandings()
+    [id1, id2, id3, id4] = [row[0] for row in standings]
+    reportMatch(id1, id2)
+    reportMatch(id3, id4)
+
+    check_1 = canPair(id1, id2)
+    check_2 = canPair(id3, id4)
+
+    if(check_1 == True or check_2 == True):
+        raise ValueError(
+            "Two players should be allowed to play each other only once.")
+    print "9. Players are correctly prevented from being paired again."
+
+
+def testPairingsForOddSize():
+    deleteMatches()
+    deletePlayers()
+    registerPlayer("Twilight Sparkle")
+    registerPlayer("Fluttershy")
+    registerPlayer("Applejack")
+    registerPlayer("Pinkie Pie")
+    registerPlayer("ButterScotch")
+
+    standings = playerStandings()
+    [id1, id2, id3, id4, id5] = [row[0] for row in standings]
+    reportMatch(id1, id2)
+    reportMatch(id3, id4)
+    reportBye(id5)
+    pairings = swissPairings()
+    
+    if len(pairings) != 3:
+        raise ValueError(
+            "For five players, swissPairings should return 3 items in list.")
+
+    [(pid1, pname1, pid2, pname2), (pid3, pname3, pid4, pname4), \
+    (pid5, pname5, pid6, pname6)] = pairings
+
+    correct_pairs = set([frozenset([id1, None]), frozenset([id3, id5]), \
+        frozenset([id2, id4])])
+    actual_pairs = set([frozenset([pid1, pid2]), frozenset([pid3, pid4]), \
+        frozenset([pid5, pid6])])
+    if correct_pairs != actual_pairs:
+        raise ValueError(
+            "After one match, new pairings should be based on wins with \
+            player at the top of the standings receiving a bye.")
+    print "10. After one round, bye and pairing assignments were correct."
+
+    reportBye(pid1)
+    reportMatch(pid3, pid4)
+    reportMatch(pid5, pid6)
+    
+    # Round 3
+    pairings = swissPairings()
+    [(pid1, pname1, pid2, pname2), (pid3, pname3, pid4, pname4), \
+    (pid5, pname5, pid6, pname6)] = pairings
+    reportBye(pid1)
+    reportMatch(pid3, pid4)
+    reportMatch(pid5, pid6)
+
+    # Round 4
+    pairings = swissPairings()
+    [(pid1, pname1, pid2, pname2), (pid3, pname3, pid4, pname4), \
+    (pid5, pname5, pid6, pname6)] = pairings
+    reportBye(pid1)
+    reportMatch(pid3, pid4)
+    reportMatch(pid5, pid6)
+
+    # Round 5
+    pairings = swissPairings()
+    [(pid1, pname1, pid2, pname2), (pid3, pname3, pid4, pname4), \
+    (pid5, pname5, pid6, pname6)] = pairings
+    reportBye(pid1)
+    reportMatch(pid3, pid4)
+    reportMatch(pid5, pid6)
+
+    standings = playerStandings()
+    winner = standings[0][1]
+    print "    After five rounds, the winner is: " + winner
+    if (winner != "Twilight Sparkle"):
+        raise ValueError("After five rounds, winner not returned correctly")
+    print "    Winner was returned correctly in standings."
+
 if __name__ == '__main__':
     testDeleteMatches()
     testDelete()
@@ -134,6 +226,9 @@ if __name__ == '__main__':
     testStandingsBeforeMatches()
     testReportMatches()
     testPairings()
+    testCanPair()
+    testPairingsForOddSize()
+
     print "Success!  All tests pass!"
 
 

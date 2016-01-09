@@ -5,19 +5,20 @@
 
 import psycopg2
 
-
-def connect():
-    """Connect to the PostgreSQL database.  Returns a database connection."""
-    return psycopg2.connect("dbname=tournament")
+def connect(database_name="tournament"):
+    try:
+        DB = psycopg2.connect("dbname={}".format(database_name))
+        cursor = DB.cursor()
+        return DB, cursor
+    except Exception as e:
+        print "connect: " + str(e)
 
 
 def deleteMatches():
     """Remove all the match records from the database."""
-    DB = connect()
-    cursor = DB.cursor()
+    DB, cursor = connect()
     try:
         cursor.execute("DELETE FROM matches")
-        cursor.execute("DELETE FROM standings")
         DB.commit()
     except Exception as e:
         print "deleteMatches: " + str(e)
@@ -27,12 +28,11 @@ def deleteMatches():
 
 def deletePlayers():
     """Remove all the player records from the database."""
-    DB = connect()
-    cursor = DB.cursor()
+    DB, cursor = connect()
     try:
         cursor.execute("DELETE FROM matches")
-        cursor.execute("DELETE FROM standings")
         cursor.execute("DELETE FROM players")
+        # Let's get the player id numbering to restart from 1
         cursor.execute("ALTER SEQUENCE players_id_seq RESTART WITH 1")
         DB.commit()
     except Exception as e:
@@ -43,8 +43,7 @@ def deletePlayers():
 
 def countPlayers():
     """Returns the number of players currently registered."""
-    DB = connect()
-    cursor = DB.cursor()
+    DB, cursor = connect()
     cursor.execute("SELECT count(*) FROM players")
     (num_players,) = cursor.fetchone()
     DB.close()
@@ -60,14 +59,11 @@ def registerPlayer(name):
     Args:
       name: the player's full name (need not be unique).
     """
-    DB = connect()
-    cursor = DB.cursor()
+    DB, cursor = connect()
     try:
         cursor.execute("INSERT INTO players (name) VALUES (%s)  \
             RETURNING id", (name,))
-        (player_id,) =  cursor.fetchone()
-        cursor.execute(
-            "INSERT INTO standings (player) VALUES (%s)", (player_id,))
+
         DB.commit()
     except Exception as e:
         print "registerPlayers: " + str(e)
@@ -87,19 +83,17 @@ def playerStandings():
       A list of tuples, each of which contains (id, name, wins, matches):
         id: the player's unique id (assigned by the database)
         name: the player's full name (as registered)
-        wins: the number of matches the player has won. Bye counts as win
-        matches: the number of matches the player has played not counting byes
+        wins: the number of matches the player has won.
+        matches: the number of matches the player has played
     """
-    DB = connect()
-    cursor = DB.cursor()
+    DB, cursor = connect()
 
-    cursor.execute("SELECT standings.player, name, wins, losses, byes \
-        FROM standings JOIN players ON standings.player = players.id \
-        LEFT JOIN omw_view ON standings.player = omw_view.player \
-        ORDER BY wins DESC, omw_view.opp_max_wins DESC")
+    cursor.execute("SELECT v1.p_id, p_name, n_wins, n_matches \
+        FROM standings_view AS v1 LEFT JOIN omw_view AS v2 \
+        ON v1.p_id = v2.p_id ORDER BY n_wins DESC, opp_max_wins DESC")
 
     rows = cursor.fetchall()
-    results = [(row[0], row[1], row[2]+row[4], row[2]+row[3]) for row in rows]
+    results = [(row[0], row[1], row[2], row[3]) for row in rows]
     DB.close()
     return results
 
@@ -115,39 +109,14 @@ def reportMatch(winner, loser):
       This method should be called only after first checking if the
       two players can be paired by calling the function canPair()
     """
-    DB = connect()
-    cursor = DB.cursor()
+    DB, cursor = connect()
     try:
         cursor.execute("INSERT INTO matches VALUES (%s, %s)", 
             (winner, loser))
-        cursor.execute("UPDATE standings SET wins = wins + 1 \
-            WHERE player = %s", (winner,))
-        cursor.execute("UPDATE standings SET losses = losses + 1 \
-            WHERE player = %s", (loser,))
+
         DB.commit()
     except Exception as e:
         print "reportMatch: " + str(e)
-        DB.rollback()
-    DB.close()
-
-
-def reportBye(player_id):
-    """Records a bye given to a player.
-
-    Args:
-      player_id: the id number of the player who got a bye.
-
-    Note:
-      See method getCandidateForBye that was used to determine who gets bye
-    """
-    DB = connect()
-    cursor = DB.cursor()
-    try:
-        cursor.execute("UPDATE standings SET byes = byes + 1 \
-            WHERE player = %s", (player_id,))
-        DB.commit()
-    except Exception as e:
-        print "reportBye: " + str(e)
         DB.rollback()
     DB.close()
 
@@ -157,8 +126,8 @@ def swissPairings():
   
     Assuming that there are an even number of players registered, each player
     appears exactly once in the pairings.  Each player is paired with another
-    player with an equal or nearly-equal win record, that is, a player adjacent
-    to him or her in the standings.
+    player with an equal or nearly-equal win record, that is, a player 
+    adjacent to him or her in the standings.
   
     Returns:
       A list of tuples, each of which contains (id1, name1, id2, name2)
@@ -170,15 +139,11 @@ def swissPairings():
     results = []
     standings = playerStandings()
 
-    # First, determine who gets a bye if we have odd number of players
+    # First, make sure we have an even number of players
     num_players = len(standings)
     if (num_players % 2 != 0):
-        index = getCandidateForBye(standings)
-        if(index < num_players):
-            row = standings[index]
-             # Not being paired with another player implies a bye
-            results.append((row[0], row[1], None, None))
-            standings.remove(row)
+        raise ValueError(
+            "Odd number of players is not supported.")
 
     # Now that we know there are even number of players in standings list
     # we can go ahead making the pairings
@@ -195,37 +160,12 @@ def swissPairings():
                 standings.remove(row_2)
                 index_1 = 0
                 break
-            index_2 = index_2 + 1
-
-    return results
-
-
-def getCandidateForBye(standings):
-    """Determines which player can be given a bye starting from the top
-       of the standings list. This will be called only when ther are an
-       odd number of players in the tournament
-
-       Args:
-         standings: The list that was obtained by calling playerStandings()
-
-       Returns:
-         The list index in standings for player who can get a bye
-    """
-    DB = connect()
-    cursor = DB.cursor()
-
-    index = 0
-    while index < len(standings):
-        row = standings[index]
-        cursor.execute("SELECT byes FROM standings \
-            WHERE player = %s", (row[0],))
-        (bye_count,) = cursor.fetchone()
-        if int(bye_count) == 0:  # this player is a valid candidate for bye
+            else:
+                index_2 = index_2 + 1
+        if (index_2 >= len(standings)):
             break
-        index = index + 1        # move on the next player down in standings
-
-    DB.close()
-    return index    
+            
+    return results
 
 
 def canPair(player_1, player_2):
@@ -239,12 +179,10 @@ def canPair(player_1, player_2):
        Returns:
         True if the players can be paired; Else, returns False
     """
-    DB = connect()
-    cursor = DB.cursor()
-
+    DB, cursor = connect()
     cursor.execute("SELECT count(*) FROM matches \
-        WHERE (winner = %s and loser = %s) or \
-        (winner = %s and loser = %s)", \
+        WHERE (winner = %s AND loser = %s) OR \
+        (winner = %s AND loser = %s)", \
         (player_1, player_2, player_2, player_1))
 
     (count,) =  cursor.fetchone()

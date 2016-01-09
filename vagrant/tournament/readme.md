@@ -32,10 +32,9 @@ various functions in the tournament module (above)
 ###Features
 * Implements Swiss system for pairing up players in each round of a tournament
 * Prevents rematches between players
-* Allows even or odd number of players in the tournament. If there is an odd  
-number of players, program assigns one player a "bye" which counts as a win
-* Ensures that a player will not receive more than one bye
 * When two players have the same number of wins, ranks them according to OMW,  
 that is, Opponent Maximum Wins - total number of wins by players they have  
-played against  
+played against
+* Normalized design with minumum number of tables and use of views for
+maintaining aggragated data
 

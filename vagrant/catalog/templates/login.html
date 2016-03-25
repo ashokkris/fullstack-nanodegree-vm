@@ -1,0 +1,69 @@
+{% extends "base.html" %}
+{% block content %}
+<script src="https://apis.google.com/js/client:platform.js?onload=start" async defer>
+</script>
+{% include "header.html" %}
+<div class="FillBottom">
+    <div class="Workspace">
+        <div class="Content">
+			<h2 class="ContentTitle">Login</h2>
+			<p class="ContentText">Please sign in with your Google+ account</p>
+			<div id="signinButton" class="ContentText">
+				<span class="g-signin"
+				  data-callback="signInCallback"
+				  data-scope="openid profile email"
+				  data-clientid="692338879178-jig44pio7gm1i12nuplelsvi918clgo0.apps.googleusercontent.com"
+				  data-redirecturi="postmessage"
+				  data-accesstype="offline"
+				  data-cookiepolicy="single_host_origin"
+				  data-callback="signInCallback"
+				  data-approvalprompt="force">
+				</span>
+			</div>
+			<div id="result" class="ContentText"></div>
+        </div>
+    </div>
+</div>
+<script>
+function signInCallback(authResult)
+{
+	if (authResult['code'])
+	{
+		// hide sign-in button now that the authorization is done
+		$('#signinButton').attr('style', 'display: none');
+
+		// send the one time use code to the server and if the server responds, show a
+		// 'success' message to the user and then redirect to our 'restaurant' page
+		$.ajax(
+		{
+			type: 'POST',
+			url: '/gconnect?state={{STATE}}',
+			processData: false,
+			data: authResult['code'],
+			contentType: 'application/octet-stream; charset=utf-8',
+			success: function(result)
+					 {
+					 	if (result)
+					 	{
+					 		$('#result').html('<br>Login Successful!<br><br>' + result + '<br>Redirecting...');
+					 			setTimeout(function()
+					 						{
+					 							window.location.href = "/catalog";
+					 						},
+					 			2000);
+					 	}
+					 	else if (authResult['error'])
+					 	{
+					 		console.log('There was an error: ' + authResult['error']);
+					 	}
+					 	else
+					 	{
+					 		$('#result').html('Failed to make a server-side call. Check your configuration and console.');
+					 	}
+					 }
+		}
+		);
+	}
+}
+</script>
+{% endblock %}	

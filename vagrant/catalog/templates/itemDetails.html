@@ -1,0 +1,31 @@
+{% extends "base.html" %}
+{% block content %}
+{% include "header.html" %}
+    <div class="FillBottom">
+        <div class="Workspace">
+            <div class="Content">
+				<h2 class="ContentTitle">{{item.title}}</h2>
+				<p class="ContentText">
+				{% if item.image is not none %}
+				<img src="{{url_for('downloadFile', filename=item.image)}}" width="300" height="200">
+				{% else %}
+				<img src="{{url_for('downloadFile', filename='noimage.png')}}" width="300" height="200">
+				{% endif %}
+				<strong>Description:</strong> {{item.description}}</p><br>
+				{% if canEdit %}
+				<div class="inline">
+					<a href = "{{url_for('editItem', category_title=category.title, item_title=item.title)}}"><h3 class="ContentList">[Edit]</h3></a>
+				</div>
+				<div class="inline">
+					<a href = "{{url_for('deleteItem', category_title=category.title, item_title=item.title)}}"><h3 class="ContentList">[Delete]</h3></a>
+				</div>
+				{% endif %}
+				<div class="inline">
+					<a href = "{{url_for('showCategoryItems', category_title=category.title)}}"><h3 class="ContentList">[Go To Category]</h3></a>
+				</div>			
+				<br class="clearBoth">
+            </div>
+        </div>
+    </div>
+{% endblock %}	
+

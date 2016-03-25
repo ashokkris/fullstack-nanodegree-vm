@@ -1,0 +1,239 @@
+*
+{
+    margin: 0;
+    padding: 0;
+    font-family: "Arial", "Cambria", sans-serif;
+}
+
+html, body, .Explorer, .Content
+{
+    height: 100%;
+}
+
+body
+{
+    background-image: url("body.png");
+    background-repeat: repeat;
+}
+
+button
+{
+    padding: 4px 4px;
+    position: relative;
+    left: 16px;
+    top: 16px;
+    cursor: pointer;
+}
+
+a
+{
+    color: #CC0066;
+}
+
+a:link 
+{
+    text-decoration: none;
+}
+
+a:visited 
+{
+    text-decoration: none;
+}
+
+a:hover 
+{
+    text-decoration: underline;
+}
+
+a:active 
+{
+    text-decoration: none;
+}
+
+p img
+{
+    float: right;
+    border: 1px solid #999999;
+    margin: 0px 15px 15px 15px;
+}
+
+h1 { font-size: 28px;}
+h2 { font-size: 24px;}
+h3 { font-size: 18px; font-weight: lighter}
+h4 { font-size: 16px;}
+h5 { font-size: 12px;}
+h6 { font-size: 10px;}
+
+h2 span 
+{ 
+    font-size: 16px;
+    vertical-align: middle;
+    margin-left: 6px;
+}
+
+.FullFrame
+{
+    width: 800px;
+    height: 500px;
+    border-radius: 8px;
+    overflow: hidden;
+    border: 2px solid #999999;
+    margin: auto;
+    margin-top: 25px;
+}
+
+    .FullFrame:before
+    {
+        content: '';
+        height: 100%;
+        float: left;
+    }
+
+.FillBottom
+{
+    position: relative;
+    z-index: 1;
+}
+
+    .FillBottom:after
+    {
+        content: '';
+        clear: both;
+        display: block;
+    }
+
+.TopBar
+{
+    background-image: url("top.png");
+    background-repeat: repeat;
+    border-bottom: 2px solid #999999;
+    color: #EFE6E6;
+}
+
+.Title
+{
+    text-align: center;
+}
+
+.Flash
+{
+    margin: auto;
+    width: 60%;
+    padding: 0px;
+    color: yellow;
+    text-align: center;
+}
+
+.Workspace
+{
+    position: absolute;
+    width: 100%;
+    height: 100%;
+}
+
+.Explorer, .Content
+{
+    overflow: auto;
+}
+
+.Explorer
+{
+    background-image: url("content_2.png");
+    background-repeat: repeat;
+    border-right: 2px solid #999999;
+    float: left;
+    width: 25%;
+}
+
+.ExplorerTitle
+{
+    color: #733434;
+    padding-left: 8px;
+    padding-top: 10px;
+    padding-bottom: 4px;
+}
+
+.CategoryList
+{
+    color: #CC0066;
+    padding-left: 8px;
+    padding-top: 6px;
+}
+
+.Content
+{
+    background-image: url("content_1.png");
+    background-repeat: repeat;
+    text-align: left;
+}
+
+.ContentTitle
+{
+    color: #733434;
+    padding-left: 16px;
+    padding-top: 10px;
+    padding-bottom: 4px;
+}
+
+.ContentList
+{
+    color: #CC0066;
+    padding-left: 16px;
+    padding-top: 6px;
+    padding-right: 2px;   
+}
+
+.ContentText
+{
+    color: black;
+    font-size: 16px;
+    padding-left: 16px;
+    padding-top: 8px;
+    padding-right: 2px;
+    line-height: 125%; 
+}
+
+.SubText
+{
+    color: gray;
+    font-size: 14px;
+    font-style: italic;
+    padding-left: 4px;
+    padding-top: 8px;
+}
+
+a.ContentText
+{
+    padding-left: 16px;
+}
+
+.ButtonStyle
+{
+    background-color: #733434;
+    color: #EFE6E6;
+    width: 65px;
+    height: 30px;
+}
+
+div.inline 
+{ 
+    float: left;
+}
+
+.clearBoth
+{ 
+    clear: both; 
+}
+
+.formControl
+{
+    width: 75%;
+    display: block;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    box-sizing: border-box;
+    position: relative;
+    left: 16px;
+    padding: 4px 6px;
+    margin-bottom: 10px;
+}

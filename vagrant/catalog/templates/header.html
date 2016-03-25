@@ -1,0 +1,21 @@
+<div class="TopBar">
+    <div class="Title">
+        <h1>Sports Catalog App</h1>
+        <p><pre>   </pre></p>
+    </div>
+    <div style="float: left; padding-left: 2px"><a href="{{url_for('showCatalog')}}">Home</a></div>
+    {% if not session.credentials %}
+    <div style="float: right; padding-right: 2px"><a href="{{url_for('showLogin')}}">Login</a></div>
+    {% else %}
+    <div style="float: right; ; padding-right: 2px"><a href="{{url_for('logout')}}">Logout</a></div>
+    {% endif %}
+    
+	{% with messages = get_flashed_messages() %}
+	    {% if messages %}
+	    <div class="Flash">
+	        {{ messages[0]}}
+	    </div>
+	    {% else %}<br>{% endif %}
+	{% endwith %}
+	
+</div>

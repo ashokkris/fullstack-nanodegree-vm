@@ -1,0 +1,35 @@
+{% extends "base.html" %}
+{% block content %}
+{% include "header.html" %}
+    <div class="FillBottom">
+        <div class="Workspace">
+            <div class="Explorer">
+            	<h2 class="ExplorerTitle">Categories</h2>
+				{% for category in categories %}
+					<a href = "{{url_for('showCategoryItems', category_title = category.title)}}">
+						<h3 class="CategoryList">{{category.title}}</h3>
+					</a>
+				{% endfor %}
+            </div>
+            <div class="Content">
+            	<h2 class="ContentTitle">
+                {% if categoryTitle %}
+                {{categoryTitle}} Items ({{items|length}} items)
+                {% else %}
+                Latest Items
+                  {% if canEdit %}
+                  <span><a href="{{url_for('addItem')}}">[Add Item]</a></span>
+                  {% endif %}
+                {% endif %}
+            	</h2>
+				{% for item in items %}
+				<div class="inline"><a href = "{{url_for('showItemDetails', category_title = item.category.title, item_title = item.title)}}"><h3 class="ContentList">{{item.title}}</h3></a></div>
+                {% if not categoryTitle %}
+				<div class="inline SubText">({{item.category.title}})</div>
+                {% endif %}
+				<br class="clearBoth" />
+				{% endfor %}
+            </div>
+        </div>
+    </div>
+{% endblock %}	

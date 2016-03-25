@@ -1,0 +1,19 @@
+{% extends "base.html" %}
+{% block content %}
+{% include "header.html" %}
+    <div class="FillBottom">
+        <div class="Workspace">
+            <div class="Content">
+            	<h2 class="ContentTitle">Delete Item</h2><br>
+				<p class="ContentText"> Are you sure you want to delete <em>{{item.title}}</em>? </p><br><br>
+				<form action='{{url_for('deleteItem', category_title=category.title, item_title=item.title)}}' method = 'post'>
+					<input name=_csrf_token type=hidden value="{{csrf_token()}}">
+					<button type="submit" class="ButtonStyle" id="submit">Delete</button>
+					<a href ='{{url_for('showItemDetails', category_title=category.title, item_title=item.title)}}'>
+						<button type="button" class="ButtonStyle">Cancel</button>
+					</a>
+				</form>
+            </div>
+        </div>
+    </div>
+{% endblock %}

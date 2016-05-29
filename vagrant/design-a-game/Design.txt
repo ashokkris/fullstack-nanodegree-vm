@@ -1,0 +1,29 @@
+Reflections:
+
+Properties I added/modified in models:
+
+- Renamed class User to UserProfile and included following new properties:
+==>num_won, num_drawn, num_lost Integer properties to store game outcomes for user
+==>win_ratio 'Computed' property that is computed as (num_won+0.5*num_drawn)/(num_won+num_drawn+num_lost)
+
+- Replaced original properties of Game with the following new properties to store TicTacToe Game state:
+==>user1 and user2 Key properties representing UserProfile of two players playing the Game
+==>next_move_user Key property representing UserProfile of user who is slated to make the next move
+==>user1_squares and user2_squares Integer properties storing the game moves played by user1 and user2 respectively
+==>game_over and game_cancelled Boolean properties storing game completion status. Both False (default), would imply that Game is currently in progress
+==>winner Key property representing UserProfile of user1 or user2, if and when one of them wins the Game. Defaults to None when game is in progress, drawn  or cancelled
+
+- Made appropriate addition/changes to Message classes to send/receive Request/Response to/from app's API endpoints
+
+
+Some trade-offs or struggles faced when implementing TicTacToe game logic:
+
+- As there are two users playing a TicTactToe game who make their moves asyncronously from their respective web client, I thought it was important for the game to implement user authentication and authorization using OAuth2. That way, the Game could also obtain and validate identity of user as moves were made in the game.
+
+- I tried to see if I could use an 'ancestor' relationship in Game model. Given that there are two users playing a game instance and it did not seem meaningful for one of the user to 'own' a game, I decided against 'ancestor' relationship. Instead, I went with two 'Has-A' properties in Game, each a 'Key' representing UserProfiles of the two users playing the game.
+
+- I realized that 'make_move' endpoints API method required that the datastore commit be done within a transaction as this method updated the states of Game and UserProfile entities. Since neither Game or UserProfile had ancestors, I assumed that they did not belong to the same ancestral path and decided to set 'xg=True' when decorating make_move method with @ndb.transactional decorator.
+
+- In 'get_user_games' endpoints API method, I wanted to limit the size of the game data that is queried and returned. So, I decided to use the optional "keys_only" argument set to True while querying for all Games in progress for a particular user. Thus, this endpoints method returns only the urlsafe keys of the games.
+
+- I was not very sure what would be the best way for 'make_move' api to take the user's tictactoe square selection. But since there are only nine squares, I decided to go with identifying each square with a unique integer - 1 thru 9. And, documenting this properly in the README.

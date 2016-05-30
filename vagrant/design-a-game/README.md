@@ -1,14 +1,22 @@
 #Full Stack Nanodegree Project 4 - 'Design a Game'
 
 ##TicTacToe Game Description:
-A TicTacToe game implemenation has been deployed to Google appspot with the name  
+A TicTacToe game implementation has been deployed to Google appspot with the name  
 **'tictactoe-ashok'**. Two individuals with Google accounts are needed to play an instance  
-of this game. The users have to first register to play the game. Then, a new game instance  
-is created and the two users take turns to play their moves. Playing a move consists of selecting  
-a TicTacToe square number. The squares are identified by numbers 1 thru 9. The square on  
-row 1-column 1 is '1', the square on row 1-column 2 is '2', the square on row 1-column 3  
-is '3', the square on row 2-column 1 is '4' and so on. A game is completed when a winning  
-pattern is filled by one of the users or when neither user is able to complete a winning pattern.
+of this game. The users have to first register with the app to play. A game instance can  
+be created for two registered users who then take turns to play their moves.  
+  
+A player makes a move by selecting a square in a 3×3 grid which are uniquely identified  
+by numbers 1 thru' 9. The square on row 1-column 1 is '1', the square on row 1-column 2 is '2',  
+the square on row 1-column 3 is '3', the square on row 2-column 1 is '4' and so on.  
+The player that succeeds in filling squares that are in a horizontal, vertical, or diagonal  
+row wins the game. The game returns a 'Game Won' message when a winning move is played by a user.  
+A game may end in a 'draw' if neither player is able to fill squares that match a winning row  
+pattern as noted above.  
+
+The app maintains a record of games won, drawn and lost by each user. It uses this information to  
+compute a 'rank' for each player that is based on the ratio of games won to games played. A 'draw'  
+is considered to be a 'half win'.  
 
 ##Instructions for Playing the game:
 Let's refer to the two users playing the game as user1 and user2.  
